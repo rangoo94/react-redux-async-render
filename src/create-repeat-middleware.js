@@ -1,8 +1,15 @@
+/**
+ * Middleware factory to queue actions in Node.js
+ *
+ * @param {string} key Key used in actions for async actions
+ * @returns {function} Redux middleware with some additional properties
+ */
 export default function createRepeatMiddleware({ key = 'repeat' } = {}) {
   let queue = []
   let middleware
 
   if (typeof window !== 'undefined') {
+    // If it's browser just pass to next middleware
     middleware = x => x
   } else {
     middleware = function repeatMiddleware() {
@@ -16,7 +23,14 @@ export default function createRepeatMiddleware({ key = 'repeat' } = {}) {
     }
   }
 
+  /**
+   * @returns {object[]} queued actions; new instance for encapsulation (partial - you can, but SHOULDN'T modify actions)
+   */
   middleware.getQueue = () => [].concat(queue)
+
+  /**
+   * Clear queue
+   */
   middleware.clear = () => {
     queue = []
   }

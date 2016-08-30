@@ -1,6 +1,15 @@
 import { renderToString } from 'react-dom/server'
-import * as c from './constants'
 
+/**
+ * Prepare ready data to show page to user
+ *
+ * @param {function({ html, actions, state }, err)} callback  Called after render, with HTML, Redux store state and queued actions
+ * @param {object} store  Redux store
+ * @param asyncMiddleware
+ * @param [repeatMiddleware]
+ * @param createVirtualDom  Method which will return virtual DOM passed to render function
+ * @param [tries]  Max. number of render retries (when async actions are dispatched again after render)
+ */
 export default function render(callback, { store, asyncMiddleware, repeatMiddleware, createVirtualDom, tries = 1 } = {}) {
   if (!store || typeof store.getState !== 'function') {
     throw new TypeError('You need to pass store to function.')
@@ -21,6 +30,12 @@ export default function render(callback, { store, asyncMiddleware, repeatMiddlew
   let result = {}
   let err = null
 
+  /**
+   * Build new render result.
+   * It caches error, to be sure that even if something will break, user will get previous version
+   *
+   * @returns {object}
+   */
   function buildResult() {
     try {
       result.html = renderToString(createVirtualDom())
@@ -35,13 +50,16 @@ export default function render(callback, { store, asyncMiddleware, repeatMiddlew
 
   result = buildResult()
 
-  if (!asyncMiddleware || asyncMiddleware.getStatus() === c.IDLE || !tries) {
+  // Run callback immediately if there is no need for async actions
+  if (!asyncMiddleware || !asyncMiddleware.isWorking() || !tries) {
     return callback(result, err)
   }
 
+  // Keep `unregister` to clean all possible references
   const unregister = asyncMiddleware.onIdle(() => {
     result = buildResult()
 
+    // If there is no HTML something has broken before any render
     if (!result.html) {
       unregister()
       callback(result, err)
@@ -49,7 +67,7 @@ export default function render(callback, { store, asyncMiddleware, repeatMiddlew
 
     tries--
 
-    if (asyncMiddleware.getStatus() === c.IDLE || !tries) {
+    if (!asyncMiddleware.isWorking() || !tries) {
       unregister()
       callback(result, err)
     }

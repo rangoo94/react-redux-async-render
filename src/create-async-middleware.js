@@ -1,11 +1,17 @@
 import * as c from './constants'
 
+/**
+ * Middleware factory to handle async actions
+ *
+ * @param {string} key Key used in actions for async actions
+ * @returns {function} Redux middleware with some additional properties
+ */
 export default function createAsyncMiddleware({ key = 'async' } = {}) {
   let callbacks = []
   let counter = 0
   let timeout = void 0
-  let status = c.IDLE
 
+  // Extracted method to call all callbacks
   const onIdle = () => callbacks.forEach(callback => callback())
 
   function asyncMiddleware() {
@@ -17,17 +23,17 @@ export default function createAsyncMiddleware({ key = 'async' } = {}) {
           console.error(`Something is wrong with your async actions. Probably FINISH method is called from outside the flow.`)
         }
 
+        // Don't break application even if some FINISH actions were running beside flow is broken
         counter = Math.max(0, counter - 1)
       } else {
         return next(action)
       }
 
-      status = counter > 0 ? c.WORKING : c.IDLE
-
       if (action[key]) {
         clearTimeout(timeout)
 
         if (!counter) {
+          // Queue callbacks in event loop to be sure that no async actions will be called immediately
           timeout = setTimeout(onIdle, 1)
         }
       }
@@ -36,13 +42,20 @@ export default function createAsyncMiddleware({ key = 'async' } = {}) {
     }
   }
 
-  asyncMiddleware.getStatus = () => status
+  const isWorking = asyncMiddleware.isWorking = () => counter > 0
 
+  /**
+   * Add listener for `idle` state
+   *
+   * @param {function} clbk
+   * @returns {function}
+   */
   asyncMiddleware.onIdle = clbk => {
     const f = () => clbk()
     callbacks.push(f)
 
-    if (status === c.IDLE) {
+    // Run callback immediately if there is no async actions, otherwise it will be called in standard flow
+    if (!isWorking()) {
       clbk()
     }
 
@@ -55,11 +68,11 @@ export default function createAsyncMiddleware({ key = 'async' } = {}) {
     }
   }
 
+  // Clear everything and remove references
   asyncMiddleware.clear = () => {
     clearTimeout(timeout)
     callbacks = []
     counter = 0
-    status = c.IDLE
   }
 
   return asyncMiddleware

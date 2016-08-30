@@ -13,11 +13,15 @@ It's used to handle if application is in `working` or `idle` state.
 When fired action has `async` property set to `start` - async jobs counter is incremented, `end` - decremented.
 
 Best way to get through async actions is to prepare `request` and `finish` action for each of them.
+Remember, that if you want to dispatch these actions on mounting component do it in `componentWillMount` instead of `componentDidMount` method!
 
 ```js
 const middleware = createAsyncMiddleware({
   key: 'async'    // Property used to determine if action is async(default: async)
 })
+
+middleware.isWorking() // checks if there are async methods running right now
+middleware.onIdle(func) // callback ran when it's ready, returns unregister function to clear its reference
 ```
 
 ### Repeat middleware
@@ -28,12 +32,15 @@ It's not so common to use. Mainly it's needed when you're subscribing somewhere,
 const middleware = createRepeatMiddleware({
   key: 'repeat'    // Property used to determine if action should be repeated client-side (default: repeat)
 })
+
+middleware.getQueue() // array of queued actions
+middleware.clear() // clear list of queued actions
 ```
 
 ### IgnoreNode middleware
 
 It's middleware to prohibit some actions of being dispatched on server-side (e.g. subscribing - combined with *repeat middleware*).
-Add `clientOnly: true` to your action to use it. Remember, that it should be added before any other middleware.
+Add `clientOnly: true` to your action to use it. Remember, that it should be added before any other middleware (or after *repeat middleware*).
 
 ```js
 const middleware = createIgnoreNodeMiddleware({
