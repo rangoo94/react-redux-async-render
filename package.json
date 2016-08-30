@@ -1,0 +1,46 @@
+{
+  "name": "react-redux-async-render",
+  "version": "0.1.0",
+  "description": "Helper for rendering async actions for React/Redux in Node.js",
+  "author": "Dawid Rusnak <dawid@drcode.pl>",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "jsnext:main": "dist/index.mjs",
+  "keywords": [
+    "react",
+    "redux",
+    "async",
+    "render",
+    "isomorphic",
+    "universal"
+  ],
+  "files": [
+    "dist"
+  ],
+  "homepage": "https://github.com/rangoo94/react-redux-async-render",
+  "bugs": "https://github.com/rangoo94/react-redux-async-render/issues",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rangoo94/react-redux-async-render.git"
+  },
+  "scripts": {
+    "build:umd": "rollup -c",
+    "build:es6": "rollup -c rollup.es6.config.js",
+    "prepublish": "npm run build:umd && npm run build:es6",
+    "test": "eslint src"
+  },
+  "license": "MIT",
+  "peerDependencies": {
+    "react-dom": "*"
+  },
+  "devDependencies": {
+    "buble": "^0.13.1",
+    "eslint": "^3.3.1",
+    "eslint-config-standard": "^5.3.5",
+    "eslint-plugin-promise": "^2.0.1",
+    "eslint-plugin-standard": "^2.0.0",
+    "rollup": "^0.34.10",
+    "rollup-plugin-buble": "^0.13.0",
+    "rollup-plugin-uglify": "^1.0.1"
+  }
+}

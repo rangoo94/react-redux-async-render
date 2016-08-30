@@ -1,0 +1,8 @@
+/coverage
+/tests
+/examples
+
+.eslintrc
+.editorconfig
+.travis.yml
+wallaby.js
