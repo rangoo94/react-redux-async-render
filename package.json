@@ -1,6 +1,6 @@
 {
   "name": "react-redux-async-render",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Helper for rendering async actions for React/Redux in Node.js",
   "author": "Dawid Rusnak <dawid@drcode.pl>",
   "main": "dist/index.js",
