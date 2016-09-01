@@ -10,7 +10,7 @@ export default function createRepeatMiddleware({ key = 'repeat' } = {}) {
 
   if (typeof window !== 'undefined') {
     // If it's browser just pass to next middleware
-    middleware = x => x
+    middleware = x => next => next
   } else {
     middleware = function repeatMiddleware() {
       return next => action => {
