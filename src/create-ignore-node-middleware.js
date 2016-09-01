@@ -8,7 +8,7 @@
 export default function createIgnoreNodeMiddleware({ key = 'clientOnly' } = {}) {
   if (typeof window !== 'undefined') {
     // When it's browser just pass action to next middleware
-    return x => x
+    return x => next => next
   } else {
     return function ignoreNodeMiddleware() {
       return next => action => {
