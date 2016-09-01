@@ -15,11 +15,11 @@ export default function render(callback, { store, asyncMiddleware, repeatMiddlew
     throw new TypeError('You need to pass store to function.')
   }
 
-  if (asyncMiddleware && (typeof asyncMiddleware !== 'function' || typeof asyncMiddleware.clear !== 'function' || typeof asyncMiddleware.getStatus !== 'function')) {
+  if (asyncMiddleware && (typeof asyncMiddleware !== 'function' || typeof asyncMiddleware.clear !== 'function' || typeof asyncMiddleware.isWorking !== 'function')) {
     throw new TypeError('You need to pass correct asyncMiddleware to function.')
   }
 
-  if (repeatMiddleware && (typeof repeatMiddleware !== 'function' || typeof repeatMiddleware.clear !== 'function' || typeof repeatMiddleware.getStatus !== 'function')) {
+  if (repeatMiddleware && (typeof repeatMiddleware !== 'function' || typeof repeatMiddleware.clear !== 'function')) {
     throw new TypeError('You need to pass correct repeatMiddleware to function.')
   }
 
